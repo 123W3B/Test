@@ -1,0 +1,41 @@
+name: Create and push Docker Image to Registry
+
+on:
+  push:
+    branches: [ "master","stage" ]
+  pull_request:
+    branches: [ "master","stage" ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set GitHub Repository
+        run: echo "GITHUB_REPOSITORY=$(echo $GITHUB_REPOSITORY | tr '[:upper:]' '[:lower:]' | sed 's/\//_/g')" >> $GITHUB_ENV
+
+      - name: Set Branch Name
+        run: echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+
+      - name: Login to Docker Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ secrets.DOCKER_REGISTRY_URL }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        
+      - name: Build and Push Docker Image
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64/v8
+          push: true
+          tags: ${{ secrets.DOCKER_REGISTRY_URL }}/${{ env.GITHUB_REPOSITORY }}:${{ env.BRANCH_NAME }}
+          build-args: NEXT_PUBLIC_SERVER_URL=${{ env.NEXT_PUBLIC_SERVER_URL }} 
