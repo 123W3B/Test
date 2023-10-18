@@ -1,0 +1,12 @@
+version: '3.7'
+
+services:
+  service1:
+    image: docker.serwer3.123web.pl/<123w3b_ with repo name eg: 123w3b_node-docker-cicd> : <branch master or stage>
+    restart: unless-stopped
+    container_name: <name>
+    environment:
+      - TZ=Europe/Warsaw
+    env_file:
+      - .env
+
