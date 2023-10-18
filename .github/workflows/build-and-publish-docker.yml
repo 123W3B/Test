@@ -52,3 +52,5 @@ jobs:
           platforms: linux/amd64,linux/arm64/v8
           push: true
           tags: ${{ secrets.DOCKER_REGISTRY_URL }}/${{ env.GITHUB_REPOSITORY }}:${{ env.BRANCH_NAME }}
+          build-args: |
+                        BRANCH=${{ env.BRANCH_NAME }}
