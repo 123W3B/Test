@@ -1,4 +1,4 @@
-name: Create and push Docker Image to Registry
+name: Test, Lint, Create and push Docker Image to Registry
 
 on:
   push:
@@ -13,6 +13,20 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm run test
+      
+      - name: Run tests
+        run: npm run lint
 
       - name: Set GitHub Repository
         run: echo "GITHUB_REPOSITORY=$(echo $GITHUB_REPOSITORY | tr '[:upper:]' '[:lower:]' | sed 's/\//_/g')" >> $GITHUB_ENV
@@ -38,4 +52,3 @@ jobs:
           platforms: linux/amd64,linux/arm64/v8
           push: true
           tags: ${{ secrets.DOCKER_REGISTRY_URL }}/${{ env.GITHUB_REPOSITORY }}:${{ env.BRANCH_NAME }}
-          build-args: NEXT_PUBLIC_SERVER_URL=${{ env.NEXT_PUBLIC_SERVER_URL }} 
